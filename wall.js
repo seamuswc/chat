@@ -1,5 +1,14 @@
+
+import { contractDetails } from './abi.js';
+
+
+
 let web3;
 let userAddress;
+let chatWallAbi;
+let chatWallFactoryAbi;
+let chatWallFactoryAddress;
+
 
 async function connectWallet() {
     if (typeof window.ethereum !== 'undefined') {
@@ -12,15 +21,38 @@ async function connectWallet() {
             // Fetching the network name
             const netId = await web3.eth.net.getId();
             let networkName;
+            let network;
             switch(netId) {
-                case 1: networkName = 'Ethereum'; break;
-                case 42161: networkName = 'Arbitrum'; break;
-                case 10: networkName = 'Optimism'; break;
-                default: networkName = 'Unknown'; break;
+                case 1: 
+                    networkName = 'Ethereum'; 
+                    network = 'ethereum';
+                    chatWallFactoryAddress = contractDetails[network].address;
+                    chatWallFactoryAbi = contractDetails[network].factoryAbi;
+                    chatWallAbi = contractDetails[network].wallAbi;
+                    break;
+                case 42161: 
+                    networkName = 'Arbitrum'; 
+                    network = 'arbitrum';
+                    chatWallFactoryAddress = contractDetails[network].address;
+                    chatWallFactoryAbi = contractDetails[network].factoryAbi;
+                    chatWallAbi = contractDetails[network].wallAbi;
+                    break;
+                case 10: 
+                    networkName = 'Optimism'; 
+                    network = 'optimism';
+                    chatWallFactoryAddress = contractDetails[network].address;
+                    chatWallFactoryAbi = contractDetails[network].factoryAbi;
+                    chatWallAbi = contractDetails[network].wallAbi;
+                    break;
+                default: 
+                    networkName = 'Unknown'; 
+                    break;
             }
             $('#title').text(`${networkName} Chat Wall`);
             $('#networkConnected').text(networkName);
-            setNetworkIcon(networkName);
+            $('#chatWallAddress').attr('placeholder', 'Enter ' + networkName + ' Chat Wall Address or Program ID');
+
+            //setNetworkIcon(networkName);
 
         } catch (error) {
             console.error("User denied account access");
@@ -29,6 +61,50 @@ async function connectWallet() {
         console.error("Ethereum browser not detected!");
     }
 }
+
+async function switchNetwork() {
+    const network = document.getElementById('networkSelect').value;
+    
+    let chainId;
+    switch (network) {
+        
+        case "ethereum":
+            console.log(network);
+            chainId = '0x1';  // Ethereum Mainnet
+            break;
+        case "arbitrum":
+            console.log(network);
+            chainId = '0xA4B1';  // Arbitrum One Mainnet
+            break;
+        case "optimism":
+            console.log(network);
+            chainId = '0xA';  // Optimism Mainnet
+            break;
+        default:
+            console.log(network);
+            return;
+    }
+    
+    try {
+        await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: chainId }],
+        });
+        
+        // After switching the network, connect the wallet and update the UI.
+        connectWallet();
+
+    } catch (error) {
+        if(error.code === 4902) {
+            console.error("The requested network is not added to MetaMask.");
+        } else {
+            console.error("User rejected request to switch network or the network switch failed.");
+        }
+    }
+}
+
+
+
 
 async function postNewMessage() {
     if(!web3) return alert('Please connect your MetaMask first.');
@@ -129,3 +205,5 @@ function setNetworkIcon(networkName) {
             break;
     }
 }
+
+export { connectWallet, switchNetwork, postNewMessage, deployNewChatWall, copyToClipboard };

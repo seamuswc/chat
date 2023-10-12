@@ -1,5 +1,12 @@
+import { connectWallet, switchNetwork, postNewMessage, deployNewChatWall, copyToClipboard } from './wall.js';
+
+
 $(document).ready(function() {
 
+    $('#networkSelect').on('change', function() {
+        switchNetwork();
+    });
+    
     $('#connectWalletButton').on('click', function() {
         connectWallet();
     });
