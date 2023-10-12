@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChatWall</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
        
         .tag {
@@ -36,13 +37,10 @@
             }
         }
 
-        .icon.is-left {
-            left: 0.5rem;  /* Adjust as per your preference */
-        }
+        
 
-        #chatWallAddress {
-             padding-left: 2.5rem;  /* Adjust based on the icon size and desired spacing */
-        }
+    
+
 
 
         
@@ -59,20 +57,33 @@
                 <div class="column">
                     <!-- This space is intentionally left blank for offset on larger screens -->
                 </div>
+
+
                 <div class="column responsive-content">
                     <div class="field">
-                        <button class="button is-primary" id="connectWalletButton">Connect to MetaMask</button>
+                        <label class="label">Select Network</label>
+                        <div class="control">
+                            <div class="select">
+                                <select id="networkSelect">
+                                    <option value="ethereum">Ethereum</option>
+                                    <option value="arbitrum">Arbitrum</option>
+                                    <option value="optimism">Optimism</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button class="button is-primary mt-4" id="connectWalletButton">Connect to Selected Network</button> 
                         <div class="content mt-4">
                             Connected Network: <span id="networkConnected">Not connected</span><br>
                             Connected Address: <span id="walletAddress">Not connected</span>
                         </div>
                     </div>
                 </div>
+                
+
+
             </div>
             
-            
-            
-
+       
             <h1 class="title" id="title">Connecting... ChatWall</h1>
 
             <div class="box" id="messages" class="textarea"></div>
@@ -96,24 +107,35 @@
                 </div>
             </div>
 
+            <br><br>
             <div class="field">
-                <label class="label">Chat Wall Address or Program ID</label>
+                <label class="label">Chat Wall Address or Program ID </label>
+                <label class="label">(Messages autoload from this address every 3 seconds...no clicking needed)</label>
+                <label class="label">(This is also the address where your messages will post to...no clicking needed)</label>
+
                 <div class="control has-icons-left">
                     <input class="input" type="text" id="chatWallAddress" placeholder="Enter Chat Wall Address or Program ID">
-                    <span class="icon is-small is-left">
-                        <img class="network_icon" src="/arb.svg" alt="Network Icon">
-                    </span>
+                    
                 </div>
             </div>
             
 
             <button class="button is-primary mb-4" id="deployButton">Deploy New Chat Wall</button>
 
+            <br><br><br>
+
+
+            
+
         </div>
     </section>
-    <script src="jq.js"></script>
-    <script src="abi.js"></script>
-    <script src="wall.js"></script>
+
+    
+    
+    <script type="module" src="wall.js"></script>
+    <script type="module" src="jq.js"></script>
+    
+
 
 </body>
 </html>
