@@ -1,14 +1,11 @@
 
 import { contractDetails } from './abi.js';
 
-
-
 let web3;
 let userAddress;
 let chatWallAbi;
 let chatWallFactoryAbi;
 let chatWallFactoryAddress;
-
 
 async function connectWallet() {
     if (typeof window.ethereum !== 'undefined') {
@@ -26,28 +23,22 @@ async function connectWallet() {
                 case 1: 
                     networkName = 'Ethereum'; 
                     network = 'ethereum';
-                    chatWallFactoryAddress = contractDetails[network].address;
-                    chatWallFactoryAbi = contractDetails[network].factoryAbi;
-                    chatWallAbi = contractDetails[network].wallAbi;
                     break;
                 case 42161: 
                     networkName = 'Arbitrum'; 
                     network = 'arbitrum';
-                    chatWallFactoryAddress = contractDetails[network].address;
-                    chatWallFactoryAbi = contractDetails[network].factoryAbi;
-                    chatWallAbi = contractDetails[network].wallAbi;
                     break;
                 case 10: 
                     networkName = 'Optimism'; 
                     network = 'optimism';
-                    chatWallFactoryAddress = contractDetails[network].address;
-                    chatWallFactoryAbi = contractDetails[network].factoryAbi;
-                    chatWallAbi = contractDetails[network].wallAbi;
                     break;
                 default: 
                     networkName = 'Unknown'; 
                     break;
             }
+            chatWallFactoryAddress = contractDetails[network].address;
+            chatWallFactoryAbi = contractDetails['abi'].factory;
+            chatWallAbi = contractDetails['abi'].wall;
             $('#title').text(`${networkName} Chat Wall`);
             $('#networkConnected').text(networkName);
             $('#chatWallAddress').attr('placeholder', 'Enter ' + networkName + ' Chat Wall Address or Program ID');

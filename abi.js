@@ -1,13 +1,15 @@
 export const contractDetails = {
     ethereum: {
-        address: '0xYourEthereumContractAddress',
-        factoryAbi: [],  
-		wallAbi: [],  
-
+        address: '0x667D15Dd78021F27b8a49478524Fe6a264f273A7',
     },
     arbitrum: {
         address: '0xf64247338331D3e83c52B37704F3DB214b4319Cb',
-        factoryAbi: [{
+    },
+    optimism: {
+        address: '0x34AF2562A607AF45b94bCC967aC8c9E7DC0204c1',
+    },
+	abi: { 
+		factory: [{
 			"anonymous": false,
 			"inputs": [
 				{
@@ -38,8 +40,9 @@ export const contractDetails = {
 			],
 			"stateMutability": "nonpayable",
 			"type": "function"
-		}],  
-		wallAbi: [{
+		}] 
+	,  
+	wall: [{
 			"inputs": [],
 			"name": "getAllMessages",
 			"outputs": [
@@ -100,11 +103,6 @@ export const contractDetails = {
 			"outputs": [],
 			"stateMutability": "nonpayable",
 			"type": "function"
-		}],  
-  
-    },
-    optimism: {
-        address: '0xYourOptimismContractAddress',
-        abi: []  
-    }
+		}]
+	}
 };
