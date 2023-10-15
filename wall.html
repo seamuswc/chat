@@ -87,15 +87,17 @@
        
             <h1 class="title" id="title">Connecting... ChatWall</h1>
 
-            <div class="box" id="messages" class="textarea"></div>
+            <div class="box" id="messages"></div>
+
+            <br><br>
+
 
             <div class="field">
-                <label class="label">Message</label>
+                <!--<label class="label">Message</label>-->
                 <div class="control">
                     <textarea class="textarea" id="message" placeholder="Your message here..."></textarea>
                 </div>
             </div>
-
             <div class="field is-flex is-justify-content-center">
                 <button class="button is-link" id="postMessageButton">Post Message</button>
             </div>
@@ -110,12 +112,10 @@
 
             <br><br>
             <div class="field">
-                <label class="label">Chat Wall Address or Program ID </label>
-                <label class="label">(Messages autoload from this address every 3 seconds...no clicking needed)</label>
-                <label class="label">(This is also the address where your messages will post to...no clicking needed)</label>
+                <label class="label">(Messages autoload from this address every 3 seconds)</label>
 
                 <div class="control has-icons-left">
-                    <input class="input" type="text" id="chatWallAddress" placeholder="Enter Chat Wall Address or Program ID">
+                    <input class="input" type="text" id="chatWallAddress" placeholder="Enter Chat Wall Address">
                     
                 </div>
             </div>

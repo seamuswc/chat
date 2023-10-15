@@ -157,6 +157,11 @@ async function deployNewChatWall() {
                 const deployedAddress = receipt.events.ChatWallDeployed.returnValues[0];
                 $('#deployedAddress').text(deployedAddress);
                 $('#deployedField').show();  // Show the deployed address field
+
+                if ($('#chatWallAddress').val().trim() === '') {
+                    $('#chatWallAddress').val(deployedAddress); // Replace 'Default Value' with your desired default value
+                }
+
                 document.getElementById('deployButton').classList.remove('is-loading');
             })
             .on('error', function(error) {
