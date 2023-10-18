@@ -3,13 +3,13 @@ export const contractDetails = {
         address: '',
     },
     arbitrum: {
-        address: '',
+        address: '0x9aB2b3dC849B7727D72d6bc2cf1c5Ce084F4D3cD',
     },
     optimism: {
         address: '0xd9E7149C7659fc8454D35E79cc8Dff4B82ee6224',
     },
 	scroll: {
-        address: '',
+        address: '0x34AF2562A607AF45b94bCC967aC8c9E7DC0204c1',
     },
 	abi: { 
 		factory: [{

@@ -8,8 +8,6 @@ let chatWallFactoryAbi;
 let chatWallFactoryAddress;
 let network;
 
-
-
 async function connectWallet() {
     if (typeof window.ethereum !== 'undefined') {
         web3 = new Web3(window.ethereum);
@@ -49,13 +47,13 @@ async function connectWallet() {
             $('#networkConnected').text(networkName);
             $('#chatWallAddress').attr('placeholder', 'Enter ' + networkName + ' Chat Wall Address or Program ID');
 
-            //ens name check
-            //let ensName = await ens(userAddress, network);
+    
             let ensName = await ethEns(userAddress);
             let displayAddress = ensName ? ensName : userAddress;
             $("#walletAddress").text(displayAddress);
 
-            //setNetworkIcon(networkName);
+           
+            $("#chatWallAddress").val("");
 
         } catch (error) {
             console.error("User denied account access ", error);
@@ -76,7 +74,7 @@ async function ethEns(address) { //api key needed or its slowed to a snail
 }
 
 
-async function switchNetwork() {
+async function switchNetwork() { //these need hex values
     const network = document.getElementById('networkSelect').value;
     
     let chainId;
@@ -151,20 +149,18 @@ let ensCount = 0;
 async function fetchMessages() {
         if(!web3) return;
         const chatWallAddress = $("#chatWallAddress").val();
-        if (typeof oldAddress === 'undefined') {
-            oldAddress = chatWallAddress;
-        } else {
-            if(oldAddress != chatWallAddress) {
-                counter = 0;
-                ensCount = 0;
-            }
-        }
         
+        //do need a way to reset counter, and enscount
+        if(chatWallAddress != oldAddress) {
+            ensCount =0;
+            counter = 0;
+            oldAddress = chatWallAddress;
+        }
+
         if (!chatWallAddress) return;  // If no chat wall address is set, don't try to fetch
         const chatWall = new web3.eth.Contract(chatWallAbi, chatWallAddress);
         let postCount =  await chatWall.methods.postCount().call();
-        //post count needs to ping the sol contract
-        console.log(counter);
+        console.log("postCount: ", postCount, "counter: ", counter); //scroll l2 bugs if postCouht is not called here? weird.
         if(counter == 0) {
             try {
                 const messages = await chatWall.methods.getAllMessages().call();
@@ -174,34 +170,30 @@ async function fetchMessages() {
                     $("#messages").append(`<p><strong class=${className}>${msg.sender}</strong>: ${msg.content}</p>`);
                     counter++;
                 });
-                
+                getAllNames(postCount);
             } catch (error) {
                 console.error("Error retrieving messages:", error);
             }
         } else if(counter < postCount) { //adding new messages
             try {
-                console.log("About to fetch 1...");
-
             const newMessages = await chatWall.methods.getMessagesFromIndex(counter).call();
-            console.log("About to fetch 2...");
             newMessages.forEach(msg => {
                 let className = "sender" + counter;
                 $("#messages").append(`<p><strong class=${className}>${msg.sender}</strong>: ${msg.content}</p>`);
                 counter++;
             });
-            
+            getAllNames(postCount);
 
             } catch (error) {
                 console.error("Error retrieving messages:", error);
             }
         }
         
-        await getAllNames(postCount);
         
 }
 
 async function getAllNames(postCount) {
-    for(ensCount; ensCount <= postCount; ensCount++) {
+    for(ensCount; ensCount < postCount; ensCount++) {
         let className = ".sender" + ensCount;
         let e = $(className);
         let address = e.text();
@@ -209,6 +201,7 @@ async function getAllNames(postCount) {
         let ensName = await ethEns(address);
         e.text(ensName);
     }
+    console.log("enscount: ", ensCount);
 }
 
 
