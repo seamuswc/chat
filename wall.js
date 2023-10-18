@@ -6,6 +6,9 @@ let userAddress;
 let chatWallAbi;
 let chatWallFactoryAbi;
 let chatWallFactoryAddress;
+let network;
+
+
 
 async function connectWallet() {
     if (typeof window.ethereum !== 'undefined') {
@@ -18,12 +21,11 @@ async function connectWallet() {
             // Fetching the network name
             const netId = await web3.eth.net.getId();
             let networkName;
-            let network;
             switch(netId) {
-                case 1: 
+                /*case 1: 
                     networkName = 'Ethereum'; 
                     network = 'ethereum';
-                    break;
+                    break;*/
                 case 42161: 
                     networkName = 'Arbitrum'; 
                     network = 'arbitrum';
@@ -31,6 +33,10 @@ async function connectWallet() {
                 case 10: 
                     networkName = 'Optimism'; 
                     network = 'optimism';
+                    break;
+                case 534352:
+                    networkName = 'Scroll';
+                    network = 'scroll';
                     break;
                 default: 
                     networkName = 'Unknown'; 
@@ -43,15 +49,32 @@ async function connectWallet() {
             $('#networkConnected').text(networkName);
             $('#chatWallAddress').attr('placeholder', 'Enter ' + networkName + ' Chat Wall Address or Program ID');
 
+            //ens name check
+            //let ensName = await ens(userAddress, network);
+            let ensName = await ethEns(userAddress);
+            let displayAddress = ensName ? ensName : userAddress;
+            $("#walletAddress").text(displayAddress);
+
             //setNetworkIcon(networkName);
 
         } catch (error) {
-            console.error("User denied account access");
+            console.error("User denied account access ", error);
         }
     } else {
         console.error("Ethereum browser not detected!");
     }
+
+    
 }
+
+async function ethEns(address) { //api key needed or its slowed to a snail
+    //too lazy to redo all web3.js to ethers, and ethers has an ens reverse lookup, web3 does not...
+    const api = "W2N54FH5UFHKUTPM49SPN2BIJEIZPK5FZS";
+    let provider = new ethers.providers.EtherscanProvider( "homestead" , api )
+    let ensName = await provider.lookupAddress(address);
+    return ensName;
+}
+
 
 async function switchNetwork() {
     const network = document.getElementById('networkSelect').value;
@@ -59,10 +82,10 @@ async function switchNetwork() {
     let chainId;
     switch (network) {
         
-        case "ethereum":
+        /*case "ethereum":
             console.log(network);
             chainId = '0x1';  // Ethereum Mainnet
-            break;
+            break;*/
         case "arbitrum":
             console.log(network);
             chainId = '0xA4B1';  // Arbitrum One Mainnet
@@ -71,9 +94,13 @@ async function switchNetwork() {
             console.log(network);
             chainId = '0xA';  // Optimism Mainnet
             break;
+        case "scroll":
+            console.log(network);
+            chainId = '0x82750';
+            break;
         default:
             console.log(network);
-            return;
+            break;
     }
     
     try {
@@ -115,28 +142,88 @@ async function postNewMessage() {
     }
 }
 
+ 
 
-
-async function continuouslyFetchMessages() {
-    // A setInterval function that fetches messages every 10 seconds
-    setInterval(async function() {
+//function getMessagesFromIndex(uint startIndex) public view returns (Message[] memory) {
+let counter = 0;
+let oldAddress;    
+let ensCount = 0;
+async function fetchMessages() {
         if(!web3) return;
         const chatWallAddress = $("#chatWallAddress").val();
+        if (typeof oldAddress === 'undefined') {
+            oldAddress = chatWallAddress;
+        } else {
+            if(oldAddress != chatWallAddress) {
+                counter = 0;
+                ensCount = 0;
+            }
+        }
+        
         if (!chatWallAddress) return;  // If no chat wall address is set, don't try to fetch
         const chatWall = new web3.eth.Contract(chatWallAbi, chatWallAddress);
-        try {
-            const messages = await chatWall.methods.getAllMessages().call();
-            $("#messages").empty();
-            messages.forEach(msg => {
-                $("#messages").append(`<p><strong>${msg.sender}</strong>: ${msg.content}</p>`);
+        let postCount =  await chatWall.methods.postCount().call();
+        //post count needs to ping the sol contract
+        console.log(counter);
+        if(counter == 0) {
+            try {
+                const messages = await chatWall.methods.getAllMessages().call();
+                $("#messages").empty(); //this rewrite all messages...will make more efficent later
+                messages.forEach(msg => {
+                    let className = "sender" + counter;
+                    $("#messages").append(`<p><strong class=${className}>${msg.sender}</strong>: ${msg.content}</p>`);
+                    counter++;
+                });
+                
+            } catch (error) {
+                console.error("Error retrieving messages:", error);
+            }
+        } else if(counter < postCount) { //adding new messages
+            try {
+                console.log("About to fetch 1...");
+
+            const newMessages = await chatWall.methods.getMessagesFromIndex(counter).call();
+            console.log("About to fetch 2...");
+            newMessages.forEach(msg => {
+                let className = "sender" + counter;
+                $("#messages").append(`<p><strong class=${className}>${msg.sender}</strong>: ${msg.content}</p>`);
+                counter++;
             });
-        } catch (error) {
-            console.error("Error retrieving messages:", error);
+            
+
+            } catch (error) {
+                console.error("Error retrieving messages:", error);
+            }
         }
-    }, 3000);
+        
+        await getAllNames(postCount);
+        
 }
 
+async function getAllNames(postCount) {
+    for(ensCount; ensCount <= postCount; ensCount++) {
+        let className = ".sender" + ensCount;
+        let e = $(className);
+        let address = e.text();
+        console.log("allnames ", address);
+        let ensName = await ethEns(address);
+        e.text(ensName);
+    }
+}
+
+
 // Call the function to initiate continuous fetch
+function continuouslyFetchMessages() {
+    fetchMessages()
+        .then(() => {
+            setTimeout(continuouslyFetchMessages, 3000); // Call the function again after 5 seconds
+        })
+        .catch(error => {
+            console.error("Error in myAsyncFunction:", error);
+            setTimeout(continuouslyFetchMessages, 3000); // Still retry even if there's an error
+        });
+}
+
 continuouslyFetchMessages();
 
 async function deployNewChatWall() {
@@ -185,6 +272,7 @@ function copyToClipboard() {
     });
 }
 
+/*
 function setNetworkIcon(networkName) {
     const iconElement = document.querySelector(".network_icon");
 
@@ -202,4 +290,52 @@ function setNetworkIcon(networkName) {
     }
 }
 
-export { connectWallet, switchNetwork, postNewMessage, deployNewChatWall, copyToClipboard };
+
+function arbEns(address) { //need cors so its blocked
+    let api = "https://api.prd.space.id/v1/getName?tld=arb1&address=" + address;
+    console.log(apiUrl);
+    
+    return fetch(apiUrl)
+        .then(response => {
+            return response.json();
+        })
+        .then(data => {
+            console.log("arbens ", data.name);
+            return data.name;
+        })
+        .catch(error => {
+            console.error("Error fetching or parsing data:", error);
+            throw error; // You can re-throw the error if you want to propagate it further
+        });
+}
+
+
+
+async function ens(address, network) { //we dont use this anymore, various name services inconsitent and buggy
+    try{
+        let ensName;
+        switch(network) {
+            case 'ethereum': 
+                break;
+            case 'arbitrum':
+                break;
+            default: 
+                break;
+        }
+    } catch(error) {
+        console.error('There was a problem with the ens api:', error.message);
+        return null;
+    }
+    
+    return NULL;
+}
+
+async function getPostCount() {
+    const chatWallAddress = $("#chatWallAddress").val();
+
+    const chatWall = new web3.eth.Contract(chatWallAbi, chatWallAddress);
+    let count =  await chatWall.methods.postCount().call();
+        $("#output2").text(count);
+}
+*/
+export { connectWallet, switchNetwork, postNewMessage, fetchMessages, deployNewChatWall, copyToClipboard };

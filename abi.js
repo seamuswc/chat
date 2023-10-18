@@ -1,12 +1,15 @@
 export const contractDetails = {
     ethereum: {
-        address: '0x667D15Dd78021F27b8a49478524Fe6a264f273A7',
+        address: '',
     },
     arbitrum: {
-        address: '0xf64247338331D3e83c52B37704F3DB214b4319Cb',
+        address: '',
     },
     optimism: {
-        address: '0x34AF2562A607AF45b94bCC967aC8c9E7DC0204c1',
+        address: '0xd9E7149C7659fc8454D35E79cc8Dff4B82ee6224',
+    },
+	scroll: {
+        address: '',
     },
 	abi: { 
 		factory: [{
@@ -42,9 +45,54 @@ export const contractDetails = {
 			"type": "function"
 		}] 
 	,  
-	wall: [{
+	wall: [
+		{
+			"inputs": [
+				{
+					"internalType": "string",
+					"name": "_content",
+					"type": "string"
+				}
+			],
+			"name": "postMessage",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
 			"inputs": [],
 			"name": "getAllMessages",
+			"outputs": [
+				{
+					"components": [
+						{
+							"internalType": "address",
+							"name": "sender",
+							"type": "address"
+						},
+						{
+							"internalType": "string",
+							"name": "content",
+							"type": "string"
+						}
+					],
+					"internalType": "struct ChatWall.Message[]",
+					"name": "",
+					"type": "tuple[]"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "uint256",
+					"name": "startIndex",
+					"type": "uint256"
+				}
+			],
+			"name": "getMessagesFromIndex",
 			"outputs": [
 				{
 					"components": [
@@ -92,17 +140,18 @@ export const contractDetails = {
 			"type": "function"
 		},
 		{
-			"inputs": [
+			"inputs": [],
+			"name": "postCount",
+			"outputs": [
 				{
-					"internalType": "string",
-					"name": "_content",
-					"type": "string"
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
 				}
 			],
-			"name": "postMessage",
-			"outputs": [],
-			"stateMutability": "nonpayable",
+			"stateMutability": "view",
 			"type": "function"
-		}]
+		}
+	]
 	}
 };

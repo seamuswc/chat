@@ -48,6 +48,10 @@
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js@1.3.4/dist/web3.min.js"></script>
+    
+    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@ethersproject/providers@5.7.2/lib/index.min.js"></script>
+
 </head>
 <body>
 
@@ -59,16 +63,16 @@
                     <!-- This space is intentionally left blank for offset on larger screens -->
                 </div>
 
-
                 <div class="column responsive-content">
                     <div class="field">
                         <label class="label">Select Network</label>
                         <div class="control">
                             <div class="select">
                                 <select id="networkSelect">
-                                    <option value="ethereum">Ethereum</option>
+                                    <option value="null" selected="selected">Default</option>
                                     <option value="arbitrum">Arbitrum</option>
                                     <option value="optimism">Optimism</option>
+                                    <option value="scroll">Scroll</option>
                                 </select>
                             </div>
                         </div>
@@ -114,7 +118,7 @@
             <div class="field">
                 <label class="label">(Messages autoload from this address every 3 seconds)</label>
 
-                <div class="control has-icons-left">
+                <div class="control">
                     <input class="input" type="text" id="chatWallAddress" placeholder="Enter Chat Wall Address">
                     
                 </div>
